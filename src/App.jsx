@@ -1,7 +1,10 @@
+import Login from "./Components/Login";
+
 export default function App() {
   return (
     <div>
-      <h1>Hello world</h1>
+      <center><h1>FINITUM</h1></center>
+      <Login/>
     </div>
   );
 }

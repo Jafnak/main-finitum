@@ -1,13 +1,7 @@
 import { MdAlternateEmail } from "react-icons/md";
 import { IoMdKey } from "react-icons/io";
-import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const navigate = useNavigate();
-
-  const handleSubmit = () => {
-    navigate("/home"); // Redirects to the home page
-  };
   return (
     <div
       className="flex items-center justify-center w-screen h-screen bg-cream"
@@ -60,7 +54,6 @@ export default function Login() {
           style={{
             backgroundColor: "#F0C987", // Soft Cream button
           }}
-          onClick={handleSubmit}
         >
           Submit
         </button>

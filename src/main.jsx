@@ -5,15 +5,25 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./Components/Login.jsx";
 import Home from "./Components/Home.jsx";
+import Signup from "./Components/Signup.jsx";
+import Intro from "./Components/Intro.jsx";
 
 const router = createBrowserRouter([
   {
     path: "",
-    element: <Login />,
+    element: <Intro />,
   },
   {
     path: "home",
     element: <Home />,
+  },
+  {
+    path: "signup",
+    element: <Signup />,
+  },
+  {
+    path: "login",
+    element: <Login />,
   },
 ]);
 

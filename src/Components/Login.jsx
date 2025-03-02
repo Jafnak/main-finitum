@@ -1,42 +1,67 @@
 import { MdAlternateEmail } from "react-icons/md";
 import { IoMdKey } from "react-icons/io";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+
+  const handleSubmit = () => {
+    navigate("/home"); // Redirects to the home page
+  };
   return (
-    <div className="flex items-center justify-center w-screen h-screen bg-gray-300">
-      <div className="px-16 py-12 bg-white max-w-[1100px] shadow-xl">
-        <h2 className="text-3xl font-semibold text-left uppercase">FINITUM</h2>
-        <h3 className="text-3xl text-left text-gray-700 uppercase">
-          Already registered?
-        </h3>
-        <div className="flex justify-between w-[100%]">
-          <p className="text-sm font-thin text-gray-600">Please sign in</p>
+    <div
+      className="flex items-center justify-center w-screen h-screen bg-cream"
+      style={{
+        backgroundColor: "#FFF8E7", // Cream background
+      }}
+    >
+      {/* Semi-transparent overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent"></div>
+
+      {/* Login Card */}
+      <div className="relative z-10 px-12 py-10 bg-white max-w-[450px] shadow-xl rounded-lg border border-gray-200">
+        <h2 className="text-4xl font-bold text-left text-gray-700 mb-2">
+          FINITUM
+        </h2>
+        <p className="text-lg text-left text-gray-500">
+          Already registered? Please sign in.
+        </p>
+
+        {/* Email Input */}
+        <div className="mt-6 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
+          <MdAlternateEmail className="text-gray-500 text-xl" />
+          <input
+            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
+            type="email"
+            placeholder="Email address"
+          />
         </div>
 
-        <div className="flex items-center gap-2 p-2  border border-gray-300">
-          <MdAlternateEmail />
+        {/* Password Input */}
+        <div className="mt-4 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
+          <IoMdKey className="text-gray-500 text-xl" />
           <input
-            className="w-[100%] font-thin border-none focus:outline-none"
-            type="email"
-            name=""
-            id=""
-            placeholder="email address"
-          />
-        </div>
-        <div className="flex items-center gap-2 p-2 mt-2 border border-gray-300">
-          <IoMdKey />
-          <input
-            className="w-[100%] font-thin border-none focus:outline-none"
+            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
             type="password"
-            name=""
-            id=""
-            placeholder="password"
+            placeholder="Password"
           />
         </div>
-        <p className="text-blue-400 cursor-pointer hover:underline">
-          Forget password?
+
+        {/* Forgot Password */}
+        <p className="mt-2 text-right text-gray-400 text-sm cursor-pointer hover:underline">
+          <Link className="nav-link" to="/signup">
+            Signup
+          </Link>
         </p>
-        <button className="px-6 w-[50%] py-2 text-white bg-red-500 font-semibold rounded-md mt-6">
+
+        {/* Submit Button */}
+        <button
+          className="mt-6 w-full py-2 bg-cream text-white font-semibold rounded-md shadow-md transition duration-200"
+          style={{
+            backgroundColor: "#F0C987", // Soft Cream button
+          }}
+          onClick={handleSubmit}
+        >
           Submit
         </button>
       </div>

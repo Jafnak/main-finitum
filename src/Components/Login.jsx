@@ -1,7 +1,39 @@
 import { MdAlternateEmail } from "react-icons/md";
 import { IoMdKey } from "react-icons/io";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 
 export default function Login() {
+  const [data, setData] = useState({
+    emailid: "",
+    password: "",
+  });
+
+  const navigate = useNavigate();
+
+  const inputHandler = (event) => {
+    setData({ ...data, [event.target.name]: event.target.value });
+  };
+
+  const readValue = () => {
+    console.log(data);
+    axios
+      .post("http://localhost:8080/login", data)
+      .then((response) => {
+        console.log(response.data);
+        if (response.data.status === "success") {
+          alert("Successfully logged in");
+          navigate("/home");
+        } else {
+          alert("Error logging in");
+        }
+      })
+      .catch((error) => {
+        console.error("There was an error logging in!", error);
+      });
+  };
+
   return (
     <div
       className="flex items-center justify-center w-screen h-screen bg-cream"
@@ -27,7 +59,10 @@ export default function Login() {
           <input
             className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
             type="email"
+            name="emailid"
+            value={data.emailid}
             placeholder="Email address"
+            onChange={inputHandler}
           />
         </div>
 
@@ -38,6 +73,9 @@ export default function Login() {
             className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
             type="password"
             placeholder="Password"
+            name="password"
+            value={data.password}
+            onChange={inputHandler}
           />
         </div>
 
@@ -54,6 +92,7 @@ export default function Login() {
           style={{
             backgroundColor: "#F0C987", // Soft Cream button
           }}
+          onClick={readValue}
         >
           Submit
         </button>

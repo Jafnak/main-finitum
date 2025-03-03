@@ -13,7 +13,7 @@ const Home = () => {
         {/* Study Group Card */}
         <div className="card bg-white text-black w-96 shadow-sm ">
           <figure>
-            <img src="study.png" alt="Study Group" />
+            <img src="stud.png" alt="Study Group" />
           </figure>
           <div className="card-body">
             <h2 className="card-title">Study Group</h2>
@@ -29,7 +29,7 @@ const Home = () => {
         {/* Gaming Card */}
         <div className="card bg-white text-black w-96 shadow-sm">
           <figure>
-            <img src="Gamings.png" alt="Gaming" />
+            <img src="game.png" alt="Gaming" />
           </figure>
           <div className="card-body">
             <h2 className="card-title">Gaming</h2>
@@ -45,10 +45,7 @@ const Home = () => {
         {/* Health and Fitness Card */}
         <div className="card bg-white text-black w-96 shadow-sm">
           <figure>
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-              alt="Health and Fitness"
-            />
+            <img src="fit.png" alt="Health and Fitness" />
           </figure>
           <div className="card-body">
             <h2 className="card-title">Health and Fitness</h2>

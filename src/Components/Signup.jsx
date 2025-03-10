@@ -5,6 +5,8 @@ import { BiSolidUserPin } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
   const [data, setData] = useState({
@@ -16,18 +18,18 @@ export default function Signup() {
     confirmpass: "",
     interests: "",
   });
+
+  const navigate = useNavigate();
+
   const inputHandler = (event) => {
     setData({ ...data, [event.target.name]: event.target.value });
   };
 
   const readValue = () => {
     if (data.password === data.confirmpass) {
-      alert("Password and Confirm Password match");
-      console.log(data);
       axios
-        .post("http://localhost:8080/usersignup", data)
+        .post("http://localhost:8080/auth/signup", data)
         .then((response) => {
-          console.log(response.data);
           if (response.data.status === "success") {
             alert("Successfully Registered");
             sessionStorage.setItem("token", response.data.token);
@@ -44,127 +46,232 @@ export default function Signup() {
       alert("Password and Confirm Password do not match");
     }
   };
-  const navigate = useNavigate();
 
   return (
     <div
-      className="flex items-center justify-center w-screen h-screen bg-cream"
-      style={{ backgroundColor: "#FFF8E7" }} // Cream background
+      className="flex items-center justify-center min-h-screen w-full relative overflow-hidden"
+      style={{ backgroundColor: "#FFF8E7" }}
     >
-      {/* Semi-transparent overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent"></div>
+      {/* Decorative Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Top Left Circle */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-100 rounded-full opacity-20 blur-3xl"></div>
 
-      {/* Signup Card */}
-      <div className="relative z-10 px-12 py-10 bg-white max-w-[450px] shadow-xl rounded-lg border border-gray-200">
-        <h2 className="text-4xl font-bold text-left text-gray-700 mb-2">
-          FINITUM
-        </h2>
-        <p className="text-lg text-left text-gray-500">Create a new account.</p>
+        {/* Bottom Right Circle */}
+        <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-orange-100 rounded-full opacity-20 blur-3xl"></div>
 
-        {/* Name Input */}
-        <div className="mt-6 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
-          <FaUser className="text-gray-500 text-xl" />
-          <input
-            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
-            type="text"
-            placeholder="Full Name"
-            name="name"
-            value={data.name}
-            onChange={inputHandler}
-          />
+        {/* Center Circle */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-100 rounded-full opacity-10 blur-3xl"></div>
+
+        {/* Decorative Lines */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-20 left-10 w-32 h-1 bg-gradient-to-r from-transparent via-blue-200 to-transparent opacity-20"></div>
+          <div className="absolute bottom-20 right-10 w-32 h-1 bg-gradient-to-r from-transparent via-orange-200 to-transparent opacity-20"></div>
         </div>
-
-        {/* Age Input */}
-        <div className="mt-4 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
-          <BiSolidUserPin className="text-gray-500 text-xl" />
-          <input
-            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
-            type="number"
-            placeholder="Age"
-            name="age"
-            value={data.age}
-            onChange={inputHandler}
-          />
-        </div>
-
-        {/* Email Input */}
-        <div className="mt-4 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
-          <MdAlternateEmail className="text-gray-500 text-xl" />
-          <input
-            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
-            type="email"
-            placeholder="Email address"
-            name="emailid"
-            value={data.emailid}
-            onChange={inputHandler}
-          />
-        </div>
-
-        {/* Interests Select Dropdown */}
-        <div className="mt-4 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
-          <select
-            className="w-full text-sm bg-transparent font-light border-none focus:outline-none text-gray-600"
-            name="interests"
-            value={data.interests}
-            onChange={inputHandler}
-          >
-            <option value="" disabled selected>
-              Select your interest
-            </option>
-            <option value="Study Group">Study Group</option>
-            <option value="Gaming">Gaming</option>
-            <option value="Health & Fitness">Health & Fitness</option>
-          </select>
-        </div>
-
-        {/* Place Input */}
-        <div className="mt-4 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
-          <FaMapMarkerAlt className="text-gray-500 text-xl" />
-          <input
-            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
-            type="text"
-            placeholder="Place"
-            name="place"
-            value={data.place}
-            onChange={inputHandler}
-          />
-        </div>
-
-        {/* Password Input */}
-        <div className="mt-4 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
-          <IoMdKey className="text-gray-500 text-xl" />
-          <input
-            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
-            type="password"
-            placeholder="Password"
-            name="password"
-            value={data.password}
-            onChange={inputHandler}
-          />
-        </div>
-
-        {/* Confirm Password Input */}
-        <div className="mt-4 flex items-center gap-3 p-3 border border-gray-300 rounded-md bg-gray-50">
-          <IoMdKey className="text-gray-500 text-xl" />
-          <input
-            className="w-full text-sm bg-transparent font-light border-none focus:outline-none placeholder-gray-400"
-            type="password"
-            placeholder="Confirm Password"
-            name="confirmpass"
-            value={data.confirmpass}
-            onChange={inputHandler}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <button
-          className="mt-6 w-full py-2 bg-cream text-white font-semibold rounded-md shadow-md transition duration-200"
-          style={{ backgroundColor: "#F0C987" }}
-          onClick={readValue}
-        >
-          Sign Up
-        </button>
       </div>
+
+      {/* Main Content */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 px-8 py-8 bg-white/90 backdrop-blur-sm max-w-[450px] w-full mx-4 shadow-xl rounded-lg border border-gray-200"
+      >
+        {/* Logo Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-center mb-6"
+        >
+          <h2 className="text-4xl font-bold text-gray-800 mb-2">FINITUM</h2>
+          <p className="text-lg text-gray-600">Create your account</p>
+        </motion.div>
+
+        {/* Form Section */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            readValue();
+          }}
+          className="space-y-4"
+        >
+          {/* Name Input */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative"
+          >
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FaUser className="text-gray-400 text-lg" />
+            </div>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-800 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-sm"
+              type="text"
+              placeholder="Full Name"
+              name="name"
+              value={data.name}
+              onChange={inputHandler}
+              required
+            />
+          </motion.div>
+
+          {/* Age Input */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="relative"
+          >
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <BiSolidUserPin className="text-gray-400 text-lg" />
+            </div>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-800 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-sm"
+              type="number"
+              placeholder="Age"
+              name="age"
+              value={data.age}
+              onChange={inputHandler}
+              required
+            />
+          </motion.div>
+
+          {/* Email Input */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            className="relative"
+          >
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <MdAlternateEmail className="text-gray-400 text-lg" />
+            </div>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-800 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-sm"
+              type="email"
+              placeholder="Email address"
+              name="emailid"
+              value={data.emailid}
+              onChange={inputHandler}
+              required
+            />
+          </motion.div>
+
+          {/* Interests Select */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6 }}
+            className="relative"
+          >
+            <select
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-800 bg-white/80 backdrop-blur-sm text-sm"
+              name="interests"
+              value={data.interests}
+              onChange={inputHandler}
+              required
+            >
+              <option value="" disabled>
+                Select your interest
+              </option>
+              <option value="Study Group">Study Group</option>
+              <option value="Gaming">Gaming</option>
+              <option value="Health & Fitness">Health & Fitness</option>
+            </select>
+          </motion.div>
+
+          {/* Place Input */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.7 }}
+            className="relative"
+          >
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FaMapMarkerAlt className="text-gray-400 text-lg" />
+            </div>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-800 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-sm"
+              type="text"
+              placeholder="Place"
+              name="place"
+              value={data.place}
+              onChange={inputHandler}
+              required
+            />
+          </motion.div>
+
+          {/* Password Input */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8 }}
+            className="relative"
+          >
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <IoMdKey className="text-gray-400 text-lg" />
+            </div>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-800 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-sm"
+              type="password"
+              placeholder="Password"
+              name="password"
+              value={data.password}
+              onChange={inputHandler}
+              required
+            />
+          </motion.div>
+
+          {/* Confirm Password Input */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9 }}
+            className="relative"
+          >
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <IoMdKey className="text-gray-400 text-lg" />
+            </div>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-gray-800 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-sm"
+              type="password"
+              placeholder="Confirm Password"
+              name="confirmpass"
+              value={data.confirmpass}
+              onChange={inputHandler}
+              required
+            />
+          </motion.div>
+
+          {/* Login Link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="text-right pt-2"
+          >
+            <Link
+              to="/login"
+              className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              Already have an account? Sign in
+            </Link>
+          </motion.div>
+
+          {/* Submit Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-3 text-white font-semibold rounded-lg shadow-md transition-all"
+            style={{ backgroundColor: "#F0C987" }}
+            type="submit"
+          >
+            Sign Up
+          </motion.button>
+        </form>
+      </motion.div>
     </div>
   );
 }

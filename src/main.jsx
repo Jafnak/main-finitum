@@ -7,6 +7,9 @@ import Login from "./Components/Login.jsx";
 import Home from "./Components/Home.jsx";
 import Signup from "./Components/Signup.jsx";
 import Intro from "./Components/Intro.jsx";
+import Study from "./Components/Study.jsx";
+import Session from "./Components/Session.jsx";
+import SingleSession from "./Components/SingleSession.jsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +27,18 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <Login />,
+  },
+  {
+    path: "study",
+    element: <Study />,
+  },
+  {
+    path: "session",
+    element: <Session />,
+  },
+  {
+    path: "session/:sessionId",
+    element: <SingleSession />,
   },
 ]);
 

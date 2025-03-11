@@ -12,6 +12,7 @@ import Session from "./Components/Session.jsx";
 import SingleSession from "./Components/SingleSession.jsx";
 import StudyList from "./Components/StudyList";
 import Profile from "./Components/Profile";
+import ChatRoom from "./Components/ChatRoom";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
   {
     path: "session/:sessionId",
     element: <SingleSession />,
+  },
+  {
+    path: "session/:sessionId/chat",
+    element: <ChatRoom />,
   },
   {
     path: "study/list",

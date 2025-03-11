@@ -77,7 +77,7 @@ const Navbar = () => {
 
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-white rounded-box z-10 mt-3 w-52 p-2 shadow-lg"
+              className="menu menu-sm dropdown-content bg-black rounded-box z-10 mt-3 w-52 p-2 shadow-lg"
             >
               <li>
                 <button onClick={handleProfile}>Profile</button>
@@ -89,6 +89,7 @@ const Navbar = () => {
                 <button
                   className="btn btn-secondary text-black w-full mt-2"
                   onClick={handleLogout}
+                  style={{ backgroundColor: "#F0C987" }}
                 >
                   Logout
                 </button>

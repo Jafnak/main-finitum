@@ -76,6 +76,7 @@ const Study = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => navigate("/study/list")}
                 className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all"
               >
                 <FaSearch className="text-xl" />

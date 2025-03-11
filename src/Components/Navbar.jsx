@@ -1,11 +1,31 @@
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const handleSubmit = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleLogout = () => {
+    sessionStorage.clear();
     navigate("/");
   };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  const handleProfile = () => {
+    navigate("/profile");
+  };
+
+  const handleSettings = () => {
+    navigate("/settings");
+  };
+
   return (
     <div>
       <div
@@ -21,14 +41,21 @@ const Navbar = () => {
 
         {/* Search Bar */}
         <div className="flex items-center gap-3">
-          <div className="relative">
+          <form onSubmit={handleSearch} className="relative">
             <input
               type="text"
               placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="input input-bordered w-32 md:w-56 pl-10 rounded-lg"
             />
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-          </div>
+            <button
+              type="submit"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2"
+            >
+              <FaSearch className="text-gray-500" />
+            </button>
+          </form>
 
           {/* User Dropdown */}
           <div className="dropdown dropdown-end">
@@ -40,7 +67,10 @@ const Navbar = () => {
               <div className="w-10 rounded-full">
                 <img
                   alt="User Profile"
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                  src={
+                    sessionStorage.getItem("profileImage") ||
+                    "https://via.placeholder.com/150"
+                  }
                 />
               </div>
             </div>
@@ -50,15 +80,15 @@ const Navbar = () => {
               className="menu menu-sm dropdown-content bg-white rounded-box z-10 mt-3 w-52 p-2 shadow-lg"
             >
               <li>
-                <a className="justify-between">Profile</a>
+                <button onClick={handleProfile}>Profile</button>
               </li>
               <li>
-                <a>Settings</a>
+                <button onClick={handleSettings}>Settings</button>
               </li>
               <li>
                 <button
                   className="btn btn-secondary text-black w-full mt-2"
-                  onClick={handleSubmit}
+                  onClick={handleLogout}
                 >
                   Logout
                 </button>

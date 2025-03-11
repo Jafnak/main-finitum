@@ -23,6 +23,7 @@ export default function Login() {
       .then((response) => {
         if (response.data.status === "success") {
           alert("Successfully logged in");
+          sessionStorage.setItem("useremail", data.emailid);
           navigate("/home");
         } else {
           alert("Error logging in");

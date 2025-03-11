@@ -10,6 +10,8 @@ import Intro from "./Components/Intro.jsx";
 import Study from "./Components/Study.jsx";
 import Session from "./Components/Session.jsx";
 import SingleSession from "./Components/SingleSession.jsx";
+import StudyList from "./Components/StudyList";
+import Profile from "./Components/Profile";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +41,14 @@ const router = createBrowserRouter([
   {
     path: "session/:sessionId",
     element: <SingleSession />,
+  },
+  {
+    path: "study/list",
+    element: <StudyList />,
+  },
+  {
+    path: "profile",
+    element: <Profile />,
   },
 ]);
 

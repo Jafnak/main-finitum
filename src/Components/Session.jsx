@@ -9,6 +9,8 @@ const Session = () => {
     type: "",
     friendEmail: "",
     duration: "",
+    createdBy:
+      sessionStorage.getItem("useremail") || sessionStorage.getItem("userid"), // Get logged in user's email
   });
 
   const handleChange = (e) => {

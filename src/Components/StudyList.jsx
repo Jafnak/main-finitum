@@ -18,6 +18,20 @@ const StudyList = () => {
     return now <= endTime;
   };
 
+  // Function to sort sessions (active first, then by end time)
+  const sortSessions = (sessions) => {
+    return [...sessions].sort((a, b) => {
+      const aActive = isSessionActive(a);
+      const bActive = isSessionActive(b);
+
+      if (aActive && !bActive) return -1;
+      if (!aActive && bActive) return 1;
+
+      // If both are active or both are inactive, sort by end time
+      return new Date(a.endTime) - new Date(b.endTime);
+    });
+  };
+
   // Fetch sessions and update their status
   useEffect(() => {
     const fetchSessions = async () => {
@@ -28,7 +42,7 @@ const StudyList = () => {
         const studySessions = response.data.filter(
           (session) => session.type === "Study Group"
         );
-        setSessions(studySessions);
+        setSessions(sortSessions(studySessions));
         setLoading(false);
       } catch (err) {
         setError(`Failed to fetch sessions: ${err.message}`);

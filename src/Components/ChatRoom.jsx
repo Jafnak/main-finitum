@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { FaPaperPlane } from "react-icons/fa";
+import { FaPaperPlane, FaClock } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 
@@ -12,11 +12,53 @@ const ChatRoom = () => {
   const [newMessage, setNewMessage] = useState("");
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userNames, setUserNames] = useState({});
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const fetchUserName = async (email) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/auth/user/${email}`
+      );
+      return response.data.name || email;
+    } catch (error) {
+      console.error("Error fetching user name:", error);
+      return email;
+    }
+  };
+
+  const updateUserNames = async (messageList) => {
+    const uniqueEmails = [...new Set(messageList.map((msg) => msg.sender))];
+    const namePromises = uniqueEmails.map(async (email) => {
+      if (!userNames[email]) {
+        const name = await fetchUserName(email);
+        setUserNames((prev) => ({ ...prev, [email]: name }));
+      }
+    });
+    await Promise.all(namePromises);
+  };
+
+  const extendSession = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/session/sessions/${sessionId}/extend`,
+        {
+          duration: 30, // Extend by 30 minutes
+        }
+      );
+      if (response.data.status === "success") {
+        setSession(response.data.session);
+        toast.success("Session extended by 30 minutes!");
+      }
+    } catch (error) {
+      console.error("Error extending session:", error);
+      toast.error("Failed to extend session");
+    }
   };
 
   useEffect(() => {
@@ -47,14 +89,18 @@ const ChatRoom = () => {
 
     socketRef.current.emit("join_room", sessionId);
 
-    socketRef.current.on("message_history", (messages) => {
+    socketRef.current.on("message_history", async (messages) => {
       setMessages(messages);
+      await updateUserNames(messages);
     });
 
-    socketRef.current.on("receive_message", (message) => {
+    socketRef.current.on("receive_message", async (message) => {
       setMessages((prev) => [...prev, message]);
+      await updateUserNames([message]);
       if (message.sender !== sessionStorage.getItem("useremail")) {
-        toast.info(`New message from ${message.sender}`);
+        toast.info(
+          `New message from ${userNames[message.sender] || message.sender}`
+        );
       }
     });
 
@@ -103,15 +149,23 @@ const ChatRoom = () => {
     <div className="min-h-screen" style={{ backgroundColor: "#FFF8E7" }}>
       {/* Chat Header */}
       <div className="bg-white shadow-md p-4">
-        <div className="container mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {session?.name}
-          </h2>
-          <p className="text-sm text-black-600">Active Study Session</p>
+        <div className="container mx-auto flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">
+              {session?.name}
+            </h2>
+            <p className="text-sm text-black-600">Active Study Session</p>
+          </div>
+          <button
+            onClick={extendSession}
+            className="flex items-center gap-2 px-4 py-2 bg-[#F0C987] text-black rounded-lg hover:bg-[#e0b977] transition-colors"
+          >
+            <FaClock />
+            <span>Extend Session (30m)</span>
+          </button>
         </div>
       </div>
 
-      {/* Chat Messages */}
       <div className="container mx-auto p-4">
         <div className="bg-gray-100 rounded-lg shadow-lg h-[calc(100vh-240px)] flex flex-col">
           {/* Messages Container */}
@@ -135,7 +189,7 @@ const ChatRoom = () => {
                   }`}
                 >
                   <p className="text-xs text-gray-600 mb-1 font-semibold">
-                    {message.sender}
+                    {userNames[message.sender] || message.sender}
                   </p>
                   <p className="text-black">{message.content}</p>
                   <p className="text-xs mt-1 text-gray-600">

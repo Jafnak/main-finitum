@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { FaPaperPlane } from "react-icons/fa";
+import { io } from "socket.io-client";
+import { toast } from "react-toastify";
 
 const ChatRoom = () => {
   const { sessionId } = useParams();
@@ -11,7 +13,7 @@ const ChatRoom = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
-  const wsRef = useRef(null);
+  const socketRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -25,22 +27,44 @@ const ChatRoom = () => {
         );
         setSession(response.data);
         setLoading(false);
+        toast.success("Successfully joined the chat room!");
       } catch (error) {
         console.error("Error fetching session:", error);
         setLoading(false);
+        toast.error("Failed to join chat room");
       }
     };
 
-    fetchSession();
-    wsRef.current = new WebSocket(`ws://localhost:8080/chat/${sessionId}`);
+    socketRef.current = io("http://localhost:8080");
 
-    wsRef.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
+    socketRef.current.on("connect", () => {
+      toast.success("Connected to chat server");
+    });
+
+    socketRef.current.on("connect_error", () => {
+      toast.error("Connection error. Trying to reconnect...");
+    });
+
+    socketRef.current.emit("join_room", sessionId);
+
+    socketRef.current.on("message_history", (messages) => {
+      setMessages(messages);
+    });
+
+    socketRef.current.on("receive_message", (message) => {
       setMessages((prev) => [...prev, message]);
-    };
+      if (message.sender !== sessionStorage.getItem("useremail")) {
+        toast.info(`New message from ${message.sender}`);
+      }
+    });
+
+    fetchSession();
 
     return () => {
-      wsRef.current?.close();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        toast.info("Disconnected from chat");
+      }
     };
   }, [sessionId]);
 
@@ -52,14 +76,15 @@ const ChatRoom = () => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    const message = {
+    const messageData = {
       sessionId,
       sender: sessionStorage.getItem("useremail"),
       content: newMessage,
       timestamp: new Date().toISOString(),
     };
 
-    wsRef.current?.send(JSON.stringify(message));
+    socketRef.current.emit("send_message", messageData);
+    toast.success("Message sent!");
     setNewMessage("");
   };
 
@@ -105,17 +130,15 @@ const ChatRoom = () => {
                 <div
                   className={`max-w-[70%] rounded-lg p-3 ${
                     message.sender === sessionStorage.getItem("useremail")
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100 text-gray-800"
+                      ? "bg-[#F0C987] text-black"
+                      : "bg-white text-black border border-gray-200"
                   }`}
                 >
-                  {message.sender !== sessionStorage.getItem("useremail") && (
-                    <p className="text-xs text-gray-600 mb-1">
-                      {message.sender}
-                    </p>
-                  )}
-                  <p>{message.content}</p>
-                  <p className="text-xs mt-1 opacity-70">
+                  <p className="text-xs text-gray-600 mb-1 font-semibold">
+                    {message.sender}
+                  </p>
+                  <p className="text-black">{message.content}</p>
+                  <p className="text-xs mt-1 text-gray-600">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </p>
                 </div>

@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [data, setData] = useState({
@@ -22,15 +23,16 @@ export default function Login() {
       .post("http://localhost:8080/auth/login", data)
       .then((response) => {
         if (response.data.status === "success") {
-          alert("Successfully logged in");
+          toast.success("Successfully logged in!");
           sessionStorage.setItem("useremail", data.emailid);
           navigate("/home");
         } else {
-          alert("Error logging in");
+          toast.error("Invalid credentials");
         }
       })
       .catch((error) => {
         console.error("There was an error logging in!", error);
+        toast.error("Login failed. Please try again.");
       });
   };
 

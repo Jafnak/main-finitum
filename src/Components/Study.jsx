@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+
 import {
   FaUsers,
   FaPlus,
@@ -8,6 +9,7 @@ import {
   FaClock,
   FaComments,
 } from "react-icons/fa";
+import Navbar from "./Navbar";
 
 const Study = () => {
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ const Study = () => {
 
         {/* Content */}
         <div className="relative container mx-auto px-4 py-16">
+          <Navbar />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

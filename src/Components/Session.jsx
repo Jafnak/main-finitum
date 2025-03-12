@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
 
 const Session = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ const Session = () => {
       }}
     >
       {/* Glassmorphism Card */}
+      <Navbar />
       <div className="relative z-10 px-12 py-10 bg-white max-w-[450px] shadow-xl rounded-lg border border-gray-200">
         <h2 className="text-4xl font-bold text-left text-gray-700 mb-2">
           FINITUM

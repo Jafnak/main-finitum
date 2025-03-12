@@ -5,6 +5,7 @@ import axios from "axios";
 import { FaPaperPlane, FaUsers, FaImage, FaUserPlus } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import Navbar from "./Navbar";
 
 const ChatRoom = () => {
   const { sessionId } = useParams();
@@ -173,6 +174,7 @@ const ChatRoom = () => {
         className="flex justify-center items-center h-screen"
         style={{ backgroundColor: "#FFF8E7" }}
       >
+        <Navbar />
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
       </div>
     );

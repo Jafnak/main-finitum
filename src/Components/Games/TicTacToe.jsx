@@ -59,10 +59,10 @@ const TicTacToe = () => {
 
     newSocket.on("gameReady", (data) => {
       console.log("Game ready received:", data);
-      const { players: gamePlayers } = data;
+      const { players: gamePlayers, currentPlayer } = data;
       setGameStatus("playing");
       setPlayers(gamePlayers);
-      setIsYourTurn(playerSymbol === "X");
+      setIsYourTurn(playerSymbol === currentPlayer);
       toast.success("Game is ready to start!");
     });
 
@@ -84,13 +84,11 @@ const TicTacToe = () => {
 
     newSocket.on("gameMove", (data) => {
       console.log("Game move received:", data);
-      const { index, symbol, currentPlayer } = data;
-      setBoard((prev) => {
-        const newBoard = [...prev];
-        newBoard[index] = symbol;
-        return newBoard;
-      });
-      setIsYourTurn(currentPlayer === playerSymbol);
+      const { index, symbol, currentPlayer, board: newBoard } = data;
+      setBoard(newBoard);
+      const isMyTurn = playerSymbol === currentPlayer;
+      setIsYourTurn(isMyTurn);
+      console.log("Turn update:", { playerSymbol, currentPlayer, isMyTurn });
     });
 
     newSocket.on("gameWin", ({ winner, winnerName }) => {

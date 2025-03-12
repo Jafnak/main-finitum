@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { FaPaperPlane, FaClock } from "react-icons/fa";
+import { FaPaperPlane, FaUsers, FaImage, FaUserPlus } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 
@@ -15,6 +15,8 @@ const ChatRoom = () => {
   const [userNames, setUserNames] = useState({});
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const fileInputRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,21 +45,41 @@ const ChatRoom = () => {
     await Promise.all(namePromises);
   };
 
-  const extendSession = async () => {
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload only image files");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("sessionId", sessionId);
+
     try {
-      const response = await axios.put(
-        `http://localhost:8080/session/sessions/${sessionId}/extend`,
+      const response = await axios.post(
+        "http://localhost:8080/upload/image",
+        formData,
         {
-          duration: 30, // Extend by 30 minutes
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      if (response.data.status === "success") {
-        setSession(response.data.session);
-        toast.success("Session extended by 30 minutes!");
-      }
+
+      const messageData = {
+        sessionId,
+        sender: sessionStorage.getItem("useremail"),
+        content: `<img src="${response.data.fileUrl}" alt="Shared image" />`,
+        type: "image",
+        timestamp: new Date().toISOString(),
+      };
+
+      socketRef.current.emit("send_message", messageData);
+      toast.success("Image uploaded successfully!");
     } catch (error) {
-      console.error("Error extending session:", error);
-      toast.error("Failed to extend session");
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image");
     }
   };
 
@@ -104,6 +126,17 @@ const ChatRoom = () => {
       }
     });
 
+    socketRef.current.emit("user_online", {
+      email: sessionStorage.getItem("useremail"),
+      sessionId,
+    });
+
+    socketRef.current.on("online_users", (users) => {
+      setOnlineUsers(
+        users.filter((user) => user !== sessionStorage.getItem("useremail"))
+      );
+    });
+
     fetchSession();
 
     return () => {
@@ -146,81 +179,212 @@ const ChatRoom = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FFF8E7" }}>
-      {/* Chat Header */}
-      <div className="bg-white shadow-md p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800">
-              {session?.name}
-            </h2>
-            <p className="text-sm text-black-600">Active Study Session</p>
-          </div>
-          <button
-            onClick={extendSession}
-            className="flex items-center gap-2 px-4 py-2 bg-[#F0C987] text-black rounded-lg hover:bg-[#e0b977] transition-colors"
+    <div className="min-h-screen bg-gradient-to-br from-[#FFF8E7] to-[#FFE4BC]">
+      {/* Enhanced Header */}
+      <div className="bg-white/90 backdrop-blur-sm shadow-lg border-b">
+        <div className="container mx-auto px-4 py-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col md:flex-row justify-between items-center gap-4"
           >
-            <FaClock />
-            <span>Extend Session (30m)</span>
-          </button>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-[#F0C987] flex items-center justify-center">
+                <FaUsers className="text-2xl text-gray-800" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  {session?.name}
+                </h2>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span>Active Study Session</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-green-100 px-4 py-2 rounded-full">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              <span className="text-green-700 font-medium">Live Session</span>
+            </div>
+          </motion.div>
         </div>
       </div>
 
-      <div className="container mx-auto p-4">
-        <div className="bg-gray-100 rounded-lg shadow-lg h-[calc(100vh-240px)] flex flex-col">
-          {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`flex ${
-                  message.sender === sessionStorage.getItem("useremail")
-                    ? "justify-end"
-                    : "justify-start"
-                }`}
-              >
-                <div
-                  className={`max-w-[70%] rounded-lg p-3 ${
-                    message.sender === sessionStorage.getItem("useremail")
-                      ? "bg-[#F0C987] text-black"
-                      : "bg-white text-black border border-gray-200"
-                  }`}
-                >
-                  <p className="text-xs text-gray-600 mb-1 font-semibold">
-                    {userNames[message.sender] || message.sender}
-                  </p>
-                  <p className="text-black">{message.content}</p>
-                  <p className="text-xs mt-1 text-gray-600">
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Message Input */}
-          <form onSubmit={sendMessage} className="p-4 border-t">
+      {/* Add this after the header div */}
+      <div className="bg-white/80 backdrop-blur-sm p-4 border-b">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium text-gray-600">
+              Online Users:
+            </span>
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 p-2 border border-black text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                style={{ backgroundColor: "#F0C987" }}
-              >
-                <FaPaperPlane />
-              </button>
+              {onlineUsers.map((user) => (
+                <div
+                  key={user}
+                  className="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full"
+                >
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="text-sm text-gray-800">
+                    {userNames[user] || user}
+                  </span>
+                  <button
+                    onClick={() => {
+                      socketRef.current.emit("invite_user", {
+                        sessionId,
+                        invitedUser: user,
+                        invitedBy: sessionStorage.getItem("useremail"),
+                      });
+                      toast.success(
+                        `Invitation sent to ${userNames[user] || user}`
+                      );
+                    }}
+                    className="ml-2 text-blue-600 hover:text-blue-800"
+                  >
+                    <FaUserPlus />
+                  </button>
+                </div>
+              ))}
             </div>
-          </form>
+          </div>
         </div>
+      </div>
+
+      {/* Main Chat Container */}
+      <div className="container mx-auto px-4 py-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
+          {/* Messages Area */}
+          <div className="h-[calc(100vh-280px)] flex flex-col">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {messages.map((message, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex ${
+                    message.sender === sessionStorage.getItem("useremail")
+                      ? "justify-end"
+                      : "justify-start"
+                  } items-end gap-3`}
+                >
+                  {message.sender !== sessionStorage.getItem("useremail") && (
+                    <div className="w-8 h-8 rounded-full bg-[#F0C987] flex-shrink-0 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-gray-800">
+                        {(userNames[message.sender] || "U")
+                          .charAt(0)
+                          .toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[70%] rounded-2xl p-4 ${
+                      message.sender === sessionStorage.getItem("useremail")
+                        ? "bg-[#F0C987] text-gray-800"
+                        : "bg-gray-100 text-gray-800"
+                    } shadow-md`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold mb-1">
+                        {userNames[message.sender] || message.sender}
+                      </span>
+                      <p className="text-gray-800 leading-relaxed">
+                        {message.type === "image" ? (
+                          <img
+                            src={message.content.match(/src="([^"]+)"/)[1]}
+                            alt="Shared image"
+                            className="max-w-full rounded-lg"
+                          />
+                        ) : (
+                          message.content
+                        )}
+                      </p>
+                      <span className="text-xs text-gray-600 mt-2 self-end">
+                        {new Date(message.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  {message.sender === sessionStorage.getItem("useremail") && (
+                    <div className="w-8 h-8 rounded-full bg-[#F0C987] flex-shrink-0 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-gray-800">
+                        {(userNames[message.sender] || "U")
+                          .charAt(0)
+                          .toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Enhanced Message Input */}
+            <motion.form
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onSubmit={sendMessage}
+              className="p-6 bg-gray-50 border-t"
+            >
+              <div className="flex gap-4 items-center">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type your message here..."
+                  className="flex-1 px-6 py-4 border border-gray-200 rounded-full bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F0C987] transition-all"
+                />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <motion.button
+                  type="button"
+                  onClick={() => fileInputRef.current.click()}
+                  className="w-12 h-12 bg-[#F0C987] text-gray-800 rounded-full hover:bg-[#e0b977] transition-colors flex items-center justify-center shadow-lg"
+                >
+                  <FaImage className="text-xl" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="submit"
+                  className="w-12 h-12 bg-[#F0C987] text-gray-800 rounded-full hover:bg-[#e0b977] transition-colors flex items-center justify-center shadow-lg"
+                >
+                  <FaPaperPlane className="text-xl" />
+                </motion.button>
+              </div>
+            </motion.form>
+          </div>
+        </div>
+
+        {/* Session Info Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-6 bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Created by</p>
+              <p className="font-medium text-gray-800">{session?.createdBy}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Duration</p>
+              <p className="font-medium text-gray-800">
+                {session?.duration} minutes
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Session Type</p>
+              <p className="font-medium text-gray-800">{session?.type}</p>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,8 +1,6 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { routes } from "./routes";
-
-const router = createBrowserRouter(routes);
+import router from "./routes";
 
 export default function App() {
   return (

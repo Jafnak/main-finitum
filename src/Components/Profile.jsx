@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { FaUser, FaEnvelope, FaMapMarkerAlt, FaUserCog } from "react-icons/fa";
+import {
+  FaUser,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaUserCog,
+  FaUsers,
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -13,6 +21,7 @@ const Profile = () => {
     profileImage: null,
   });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -55,10 +64,46 @@ const Profile = () => {
   };
 
   return (
-    <div
-      className="min-h-screen py-12 px-4"
-      style={{ backgroundColor: "#FFF8E7" }}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-[#FFF8E7] to-[#FFE4BC]">
+      <Navbar />
+
+      {/* Enhanced Header */}
+      <div className="bg-white/90 backdrop-blur-sm shadow-lg border-b mt-16">
+        {" "}
+        {/* Added mt-16 for navbar spacing */}
+        <div className="container mx-auto px-4 py-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col md:flex-row justify-between items-center gap-4"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-[#F0C987] flex items-center justify-center">
+                <FaUsers className="text-2xl text-gray-800" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">My Profile</h2>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span>{profile.interests}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate("/study/list")}
+                className="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Back to Sessions
+              </button>
+              <div className="flex items-center gap-2 bg-green-100 px-4 py-2 rounded-full">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span className="text-green-700 font-medium">Live Session</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>

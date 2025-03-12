@@ -1,9 +1,10 @@
-import { FaSearch } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaSearch, FaHome, FaBook, FaGamepad } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleLogout = () => {
@@ -18,36 +19,66 @@ const Navbar = () => {
     }
   };
 
-  const handleProfile = () => {
-    navigate("/profile");
-  };
-
-  const handleSettings = () => {
-    navigate("/settings");
-  };
-
   return (
-    <div>
-      <div
-        className="navbar bg-cream shadow-sm px-4"
-        style={{
-          backgroundColor: "#FFF8E7", // Cream background
-        }}
-      >
-        {/* Brand Name */}
-        <div className="flex-1 text-2xl font-bold text-gray-400">
-          <h1>FINITUM</h1>
+    <div className="fixed top-0 left-0 right-0 z-50">
+      <div className="navbar bg-white/90 backdrop-blur-sm shadow-md px-4 py-2">
+        {/* Brand Name and Navigation */}
+        <div className="flex-1 flex items-center gap-8">
+          <h1
+            onClick={() => navigate("/home")}
+            className="text-2xl font-bold text-gray-800 cursor-pointer hover:text-gray-600 transition-colors"
+          >
+            FINITUM
+          </h1>
+
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <button
+              onClick={() => navigate("/home")}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                location.pathname === "/home"
+                  ? "bg-[#F0C987] text-gray-800"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <FaHome />
+              <span>Home</span>
+            </button>
+            <button
+              onClick={() => navigate("/study")}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                location.pathname === "/study"
+                  ? "bg-[#F0C987] text-gray-800"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <FaBook />
+              <span>Study</span>
+            </button>
+            <button
+              onClick={() => navigate("/gaming")}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                location.pathname === "/gaming"
+                  ? "bg-[#F0C987] text-gray-800"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <FaGamepad />
+              <span>Gaming</span>
+            </button>
+          </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="flex items-center gap-3">
+        {/* Search and User Section */}
+        <div className="flex items-center gap-4">
+          {/* Search Bar */}
           <form onSubmit={handleSearch} className="relative">
             <input
               type="text"
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input input-bordered w-32 md:w-56 pl-10 rounded-lg"
+              className="input input-bordered w-32 md:w-56 pl-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#F0C987]"
             />
             <button
               type="submit"
@@ -64,7 +95,7 @@ const Navbar = () => {
               role="button"
               className="btn btn-ghost btn-circle avatar"
             >
-              <div className="w-10 rounded-full">
+              <div className="w-10 rounded-full border-2 border-[#F0C987]">
                 <img
                   alt="User Profile"
                   src={
@@ -77,19 +108,36 @@ const Navbar = () => {
 
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-black rounded-box z-10 mt-3 w-52 p-2 shadow-lg"
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-lg bg-white rounded-box w-52"
             >
               <li>
-                <button onClick={handleProfile}>Profile</button>
-              </li>
-              <li>
-                <button onClick={handleSettings}>Settings</button>
+                <button
+                  onClick={() => navigate("/profile")}
+                  className="py-2 hover:bg-gray-100 transition-colors"
+                >
+                  Profile
+                </button>
               </li>
               <li>
                 <button
-                  className="btn btn-secondary text-black w-full mt-2"
+                  onClick={() => navigate("/study/list")}
+                  className="py-2 hover:bg-gray-100 transition-colors"
+                >
+                  Study Sessions
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate("/gaming/list")}
+                  className="py-2 hover:bg-gray-100 transition-colors"
+                >
+                  Game Rooms
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={handleLogout}
-                  style={{ backgroundColor: "#F0C987" }}
+                  className="py-2 text-red-600 hover:bg-red-50 transition-colors"
                 >
                   Logout
                 </button>

@@ -1,53 +1,76 @@
-import Login from "./Components/Login.jsx";
-import Home from "./Components/Home.jsx";
-import Signup from "./Components/Signup.jsx";
-import Intro from "./Components/Intro.jsx";
-import Study from "./Components/Study.jsx";
-import Session from "./Components/Session.jsx";
-import SingleSession from "./Components/SingleSession.jsx";
+import { createBrowserRouter } from "react-router-dom";
+import Login from "./Components/Login";
+import Signup from "./Components/Signup";
+import Home from "./Components/Home";
+import Study from "./Components/Study";
 import StudyList from "./Components/StudyList";
-import Profile from "./Components/Profile";
+import Session from "./Components/Session";
+import SingleSession from "./Components/SingleSession";
 import ChatRoom from "./Components/ChatRoom";
+import Profile from "./Components/Profile";
+import Gaming from "./Components/Gaming";
+import GamingList from "./Components/GamingList";
+import TicTacToe from "./Components/Games/TicTacToe";
+import TicTacToeIntro from "./Components/Games/TicTacToeIntro";
+import Intro from "./Components/Intro";
 
-export const routes = [
+const router = createBrowserRouter([
   {
-    path: "",
+    path: "/",
     element: <Intro />,
   },
   {
-    path: "home",
-    element: <Home />,
-  },
-  {
-    path: "signup",
-    element: <Signup />,
-  },
-  {
-    path: "login",
+    path: "/login",
     element: <Login />,
   },
   {
-    path: "study",
+    path: "/signup",
+    element: <Signup />,
+  },
+  {
+    path: "/home",
+    element: <Home />,
+  },
+  {
+    path: "/study",
     element: <Study />,
   },
   {
-    path: "session",
-    element: <Session />,
-  },
-  {
-    path: "session/:sessionId",
-    element: <SingleSession />,
-  },
-  {
-    path: "session/:sessionId/chat",
-    element: <ChatRoom />,
-  },
-  {
-    path: "study/list",
+    path: "/study/list",
     element: <StudyList />,
   },
   {
-    path: "profile",
+    path: "/session",
+    element: <Session />,
+  },
+  {
+    path: "/session/:sessionId",
+    element: <SingleSession />,
+  },
+  {
+    path: "/session/:sessionId/chat",
+    element: <ChatRoom />,
+  },
+  {
+    path: "/profile",
     element: <Profile />,
   },
-];
+  {
+    path: "/gaming",
+    element: <Gaming />,
+  },
+  {
+    path: "/gaming/list",
+    element: <GamingList />,
+  },
+  {
+    path: "/session/:sessionId/game",
+    element: <TicTacToeIntro />,
+  },
+  {
+    path: "/session/:sessionId/game/play",
+    element: <TicTacToe />,
+  },
+]);
+
+export default router;

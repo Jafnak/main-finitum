@@ -84,7 +84,7 @@ const TicTacToe = () => {
 
     newSocket.on("gameMove", (data) => {
       console.log("Game move received:", data);
-      const { index, symbol, currentPlayer, board: newBoard } = data;
+      const { currentPlayer, board: newBoard } = data;
       setBoard(newBoard);
       const isMyTurn = playerSymbol === currentPlayer;
       setIsYourTurn(isMyTurn);

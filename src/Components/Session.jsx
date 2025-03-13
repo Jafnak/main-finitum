@@ -11,7 +11,7 @@ const Session = () => {
     friendEmail: "",
     duration: "",
     createdBy:
-      sessionStorage.getItem("useremail") || sessionStorage.getItem("userid"), // Get logged in user's email
+      sessionStorage.getItem("useremail") || sessionStorage.getItem("userid"),
   });
 
   const handleChange = (e) => {
@@ -43,10 +43,9 @@ const Session = () => {
     <div
       className="flex items-center justify-center min-h-screen px-4"
       style={{
-        backgroundColor: "#FFF8E7", // Cream background matching login page
+        backgroundColor: "#FFF8E7",
       }}
     >
-      {/* Glassmorphism Card */}
       <Navbar />
       <div className="relative z-10 px-12 py-10 bg-white max-w-[450px] shadow-xl rounded-lg border border-gray-200">
         <h2 className="text-4xl font-bold text-left text-gray-700 mb-2">

@@ -44,7 +44,8 @@ const TicTacToeIntro = () => {
               Tic Tac Toe
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Challenge your friends to the classic game of X's and O's
+              Challenge your friends to the classic game of X &quots and O
+              &quots
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -85,7 +86,7 @@ const TicTacToeIntro = () => {
               How to Play
             </h2>
             <ol className="list-decimal list-inside space-y-4 text-gray-600">
-              <li>Click "Start Playing" to enter the game room</li>
+              <li>Click &quot;Start Playing&quot; to enter the game room</li>
               <li>Wait for another player to join your session</li>
               <li>Take turns placing your symbol (X or O) on the board</li>
               <li>

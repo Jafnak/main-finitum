@@ -3,7 +3,7 @@ import {
   FaBook,
   FaGamepad,
   FaSignOutAlt,
-  FaUsers,
+  FaUser,
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -15,8 +15,6 @@ const Navbar = () => {
     sessionStorage.clear();
     navigate("/");
   };
-
-  // Default image
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
@@ -51,20 +49,13 @@ const Navbar = () => {
           ))}
 
           {/* Profile and Logout */}
-          <div className="flex items-center gap-4 ml-4">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/profile")}
-              className="w-10 h-10 rounded-full border-2 border-[#F0C987] overflow-hidden"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              <img
-                alt="User Profile"
-                src={
-                  sessionStorage.getItem("profileImage") || (
-                    <FaUsers className="text-2xl text-gray-800" />
-                  )
-                }
-                className="w-full h-full object-cover"
-              />
+              <FaUser className="text-gray-700" />
+              <span className="text-gray-700">Profile</span>
             </button>
             <button
               onClick={handleLogout}

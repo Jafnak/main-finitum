@@ -7,8 +7,9 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaGamepad,
+  FaDumbbell,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 
 const GamingList = () => {
@@ -17,6 +18,10 @@ const GamingList = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all"); // 'all', 'active', or 'inactive'
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isHealthRoute = location.pathname.includes("/health");
+  const sessionType = isHealthRoute ? "Health & Fitness" : "Gaming";
 
   // Function to check if a session is active
   const isSessionActive = (session) => {
@@ -45,10 +50,10 @@ const GamingList = () => {
         const response = await axios.get(
           "http://localhost:8080/session/sessions"
         );
-        const gamingSessions = response.data.filter(
-          (session) => session.type === "Gaming"
+        const filteredSessions = response.data.filter(
+          (session) => session.type === sessionType
         );
-        setSessions(sortSessions(gamingSessions));
+        setSessions(sortSessions(filteredSessions));
         setLoading(false);
       } catch (err) {
         setError(`Failed to fetch sessions: ${err.message}`);
@@ -60,7 +65,7 @@ const GamingList = () => {
     // Update session status every minute
     const intervalId = setInterval(fetchSessions, 60000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [sessionType]);
 
   // Filter sessions based on status
   const filteredSessions = sessions.filter((session) => {
@@ -105,9 +110,13 @@ const GamingList = () => {
         animate={{ opacity: 1, y: 0 }}
         className="container mx-auto mb-12 text-center pt-16"
       >
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">Game Rooms</h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-4">
+          {isHealthRoute ? "Health & Fitness Rooms" : "Game Rooms"}
+        </h1>
         <p className="text-xl text-gray-600">
-          Find and join active gaming sessions
+          {isHealthRoute
+            ? "Find and join active fitness sessions"
+            : "Find and join active gaming sessions"}
         </p>
       </motion.div>
 
@@ -171,7 +180,11 @@ const GamingList = () => {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                      <FaGamepad className="text-2xl text-gray-600" />
+                      {isHealthRoute ? (
+                        <FaDumbbell className="text-2xl text-gray-600" />
+                      ) : (
+                        <FaGamepad className="text-2xl text-gray-600" />
+                      )}
                       <h3 className="text-xl font-semibold text-gray-800">
                         {session.name}
                       </h3>
@@ -207,11 +220,17 @@ const GamingList = () => {
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => navigate(`/session/${session._id}/game`)}
+                      onClick={() =>
+                        navigate(
+                          isHealthRoute
+                            ? `/session/${session._id}/fitness`
+                            : `/session/${session._id}/game`
+                        )
+                      }
                       className="w-full mt-6 py-3 text-white font-semibold rounded-lg shadow-md transition-all"
                       style={{ backgroundColor: "#F0C987" }}
                     >
-                      Join Game
+                      Join {isHealthRoute ? "Fitness Session" : "Game"}
                     </motion.button>
                   )}
                 </div>
@@ -228,10 +247,12 @@ const GamingList = () => {
           >
             <p className="text-xl text-gray-600">
               {filter === "active"
-                ? "No active game rooms found"
+                ? `No active ${isHealthRoute ? "fitness" : "game"} rooms found`
                 : filter === "inactive"
-                ? "No inactive game rooms found"
-                : "No game rooms found"}
+                ? `No inactive ${
+                    isHealthRoute ? "fitness" : "game"
+                  } rooms found`
+                : `No ${isHealthRoute ? "fitness" : "game"} rooms found`}
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -239,7 +260,7 @@ const GamingList = () => {
               onClick={() => navigate("/session")}
               className="mt-4 px-6 py-3 bg-white text-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all font-semibold"
             >
-              Create a Game Room
+              Create a {isHealthRoute ? "Fitness" : "Game"} Room
             </motion.button>
           </motion.div>
         )}

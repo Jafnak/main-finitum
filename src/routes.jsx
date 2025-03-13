@@ -12,6 +12,7 @@ import Gaming from "./Components/Gaming";
 import GamingList from "./Components/GamingList";
 import TicTacToe from "./Components/Games/TicTacToe";
 import TicTacToeIntro from "./Components/Games/TicTacToeIntro";
+import Fitness from "./Components/Games/Fitness";
 import Intro from "./Components/Intro";
 
 const router = createBrowserRouter([
@@ -70,6 +71,18 @@ const router = createBrowserRouter([
   {
     path: "/session/:sessionId/game/play",
     element: <TicTacToe />,
+  },
+  {
+    path: "/session/:sessionId/fitness",
+    element: <Fitness />,
+  },
+  {
+    path: "/health",
+    element: <Fitness />,
+  },
+  {
+    path: "/health/list",
+    element: <GamingList />,
   },
 ]);
 

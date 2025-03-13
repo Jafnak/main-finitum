@@ -4,6 +4,7 @@ import {
   FaGamepad,
   FaSignOutAlt,
   FaUser,
+  FaDumbbell,
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -33,6 +34,11 @@ const Navbar = () => {
             { path: "/home", label: "Home", icon: FaHome },
             { path: "/study", label: "Study", icon: FaBook },
             { path: "/gaming", label: "Gaming", icon: FaGamepad },
+            {
+              path: "/health/list",
+              label: "Health & Fitness",
+              icon: FaDumbbell,
+            },
           ].map((item) => (
             <button
               key={item.path}

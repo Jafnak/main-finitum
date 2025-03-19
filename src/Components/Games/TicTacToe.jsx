@@ -35,6 +35,8 @@ const TicTacToe = () => {
       transports: ["websocket"],
       autoConnect: true,
       reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
     });
 
     newSocket.on("connect", () => {
@@ -48,12 +50,23 @@ const TicTacToe = () => {
       toast.error("Failed to connect to game server");
     });
 
+    newSocket.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+      if (reason === "io server disconnect") {
+        // Server initiated disconnect, try to reconnect
+        newSocket.connect();
+      }
+    });
+
     newSocket.on("gameStart", (data) => {
       console.log("Game start received:", data);
       const { symbol, players: gamePlayers } = data;
       setPlayerSymbol(symbol);
       setPlayers(gamePlayers);
       setGameStatus("waiting");
+      if (symbol === "X") {
+        setIsYourTurn(true);
+      }
       toast.info(`You are playing as ${symbol}`);
     });
 
@@ -62,7 +75,12 @@ const TicTacToe = () => {
       const { players: gamePlayers, currentPlayer } = data;
       setGameStatus("playing");
       setPlayers(gamePlayers);
-      setIsYourTurn(playerSymbol === currentPlayer);
+      setIsYourTurn(currentPlayer === playerSymbol);
+      console.log("Turn state:", {
+        currentPlayer,
+        playerSymbol,
+        isYourTurn: currentPlayer === playerSymbol,
+      });
       toast.success("Game is ready to start!");
     });
 
@@ -86,9 +104,12 @@ const TicTacToe = () => {
       console.log("Game move received:", data);
       const { currentPlayer, board: newBoard } = data;
       setBoard(newBoard);
-      const isMyTurn = playerSymbol === currentPlayer;
-      setIsYourTurn(isMyTurn);
-      console.log("Turn update:", { playerSymbol, currentPlayer, isMyTurn });
+      setIsYourTurn(currentPlayer === playerSymbol);
+      console.log("Turn update:", {
+        playerSymbol,
+        currentPlayer,
+        isYourTurn: currentPlayer === playerSymbol,
+      });
     });
 
     newSocket.on("gameWin", ({ winner, winnerName }) => {

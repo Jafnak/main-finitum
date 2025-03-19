@@ -35,7 +35,7 @@ const Navbar = () => {
             { path: "/study", label: "Study", icon: FaBook },
             { path: "/gaming", label: "Gaming", icon: FaGamepad },
             {
-              path: "/health/list",
+              path: "/health",
               label: "Health & Fitness",
               icon: FaDumbbell,
             },

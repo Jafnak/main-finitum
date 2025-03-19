@@ -31,7 +31,7 @@ const Home = () => {
         "Crush your fitness goals with Finitum's health groups—stay motivated, share tips, and thrive together!",
       image: "fit.png",
       icon: <FaDumbbell className="text-4xl text-gray-700" />,
-      path: "/health/list",
+      path: "/health",
       color: "from-green-500 to-green-600",
     },
   ];

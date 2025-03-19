@@ -14,6 +14,7 @@ import TicTacToe from "./Components/Games/TicTacToe";
 import TicTacToeIntro from "./Components/Games/TicTacToeIntro";
 import Fitness from "./Components/Games/Fitness";
 import Intro from "./Components/Intro";
+import Health from "./Components/Health";
 
 const router = createBrowserRouter([
   {
@@ -78,7 +79,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/health",
-    element: <Fitness />,
+    element: <Health />,
   },
   {
     path: "/health/list",

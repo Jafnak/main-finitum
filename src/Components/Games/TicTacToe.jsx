@@ -64,9 +64,11 @@ const TicTacToe = () => {
       setPlayerSymbol(symbol);
       setPlayers(gamePlayers);
       setGameStatus("waiting");
-      if (symbol === "X") {
-        setIsYourTurn(true);
-      }
+      setIsYourTurn(symbol === "X");
+      console.log("Initial turn state:", {
+        symbol,
+        isYourTurn: symbol === "X",
+      });
       toast.info(`You are playing as ${symbol}`);
     });
 
@@ -76,7 +78,7 @@ const TicTacToe = () => {
       setGameStatus("playing");
       setPlayers(gamePlayers);
       setIsYourTurn(currentPlayer === playerSymbol);
-      console.log("Turn state:", {
+      console.log("Game ready turn state:", {
         currentPlayer,
         playerSymbol,
         isYourTurn: currentPlayer === playerSymbol,
@@ -105,7 +107,7 @@ const TicTacToe = () => {
       const { currentPlayer, board: newBoard } = data;
       setBoard(newBoard);
       setIsYourTurn(currentPlayer === playerSymbol);
-      console.log("Turn update:", {
+      console.log("Move turn state:", {
         playerSymbol,
         currentPlayer,
         isYourTurn: currentPlayer === playerSymbol,
@@ -135,20 +137,50 @@ const TicTacToe = () => {
 
     newSocket.on("playerLeft", ({ playerName, remainingPlayers }) => {
       console.log("Player left received:", { playerName, remainingPlayers });
-      setGameStatus("waiting");
-      setBoard(Array(9).fill(""));
-      setWinner(null);
-      setPlayers(remainingPlayers);
-      toast.error(`${playerName} left the game`);
+      // Only reset game state if the leaving player was a player (not a spectator)
+      if (remainingPlayers.length < 2) {
+        setGameStatus("waiting");
+        setBoard(Array(9).fill(""));
+        setWinner(null);
+        setPlayers(remainingPlayers);
+        toast.error(`${playerName} left the game`);
+      } else {
+        // If there are still enough players, just update the players list
+        setPlayers(remainingPlayers);
+        toast.info(`${playerName} left the game`);
+      }
     });
 
+    // Cleanup function to properly disconnect socket
     return () => {
       console.log("Cleaning up socket connection");
       if (newSocket) {
         newSocket.disconnect();
       }
     };
-  }, [sessionId, joinGame]);
+  }, [sessionId, joinGame, playerSymbol]); // Added playerSymbol to dependencies
+
+  // Add a new useEffect to handle socket reconnection
+  useEffect(() => {
+    if (socket && !socket.connected) {
+      console.log("Socket disconnected, attempting to reconnect...");
+      socket.connect();
+    }
+  }, [socket]);
+
+  // Add a new useEffect to handle game state persistence
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (socket) {
+        socket.emit("leaveGame", { sessionId });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [socket, sessionId]);
 
   const handleClick = (index) => {
     if (
@@ -238,7 +270,7 @@ const TicTacToe = () => {
               <div
                 className={`p-4 rounded-lg ${
                   players.find((p) => p.symbol === "X")?.symbol === playerSymbol
-                    ? "bg-blue-100"
+                    ? "bg-blue-200 border-2 border-blue-500"
                     : "bg-gray-100"
                 }`}
               >
@@ -249,9 +281,17 @@ const TicTacToe = () => {
               </div>
 
               {/* Game Status */}
-              <div className="p-4 rounded-lg bg-white">
+              <div className="p-4 rounded-lg bg-white border-2 border-[#F0C987]">
                 <h3 className="text-lg font-semibold mb-1">Status</h3>
-                <p className="text-sm text-gray-600">
+                <p
+                  className={`text-sm font-medium ${
+                    gameStatus === "playing" && isYourTurn
+                      ? "text-green-600"
+                      : gameStatus === "playing"
+                      ? "text-red-600"
+                      : "text-gray-600"
+                  }`}
+                >
                   {gameStatus === "waiting" && "Waiting for players..."}
                   {gameStatus === "playing" &&
                     (isYourTurn ? "Your turn!" : "Opponent's turn")}
@@ -264,7 +304,7 @@ const TicTacToe = () => {
               <div
                 className={`p-4 rounded-lg ${
                   players.find((p) => p.symbol === "O")?.symbol === playerSymbol
-                    ? "bg-red-100"
+                    ? "bg-red-200 border-2 border-red-500"
                     : "bg-gray-100"
                 }`}
               >

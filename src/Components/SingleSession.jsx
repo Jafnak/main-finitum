@@ -11,6 +11,7 @@ const SingleSession = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -19,6 +20,11 @@ const SingleSession = () => {
           `http://localhost:8080/session/sessions/${sessionId}`
         );
         setSession(response.data);
+        // Calculate initial time left
+        const endTime = new Date(response.data.endTime);
+        const now = new Date();
+        const remaining = Math.max(0, endTime - now);
+        setTimeLeft(remaining);
         setLoading(false);
       } catch (err) {
         setError(`Failed to load session: ${err.message}`);
@@ -28,6 +34,31 @@ const SingleSession = () => {
 
     fetchSession();
   }, [sessionId]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!timeLeft) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1000) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const formatTime = (ms) => {
+    if (!ms) return "Session Ended";
+
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   if (loading) {
     return (
@@ -71,7 +102,7 @@ const SingleSession = () => {
     if (session.type === "Gaming") {
       navigate(`/session/${sessionId}/game`);
     } else if (session.type === "Study Group") {
-      navigate(`/session/${sessionId}/study`);
+      navigate("/study/list");
     } else if (session.type === "Health & Fitness") {
       navigate(`/session/${sessionId}/fitness`);
     }
@@ -114,9 +145,13 @@ const SingleSession = () => {
               >
                 <FaClock className="text-xl text-gray-600" />
                 <div>
-                  <p className="text-sm text-gray-500">Duration</p>
-                  <p className="text-gray-800 font-medium">
-                    {session.duration} minutes
+                  <p className="text-sm text-gray-500">Time Remaining</p>
+                  <p
+                    className={`text-gray-800 font-medium ${
+                      timeLeft <= 0 ? "text-red-500" : ""
+                    }`}
+                  >
+                    {formatTime(timeLeft)}
                   </p>
                 </div>
               </motion.div>
@@ -153,9 +188,14 @@ const SingleSession = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleJoinSession}
-              className="w-full py-4 mt-6 bg-[#F0C987] text-gray-800 rounded-lg font-semibold hover:bg-[#e0b977] transition-colors"
+              disabled={timeLeft <= 0}
+              className={`w-full py-4 mt-6 rounded-lg font-semibold transition-colors ${
+                timeLeft <= 0
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-[#F0C987] hover:bg-[#e0b977]"
+              }`}
             >
-              Join Session
+              {timeLeft <= 0 ? "Session Ended" : "Join Session"}
             </motion.button>
           </div>
         </motion.div>
